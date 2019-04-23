@@ -1,0 +1,34 @@
+{
+    "general": {
+        "base_directory": ".",
+        "satellite": "landsat8",
+        "tiles_directory": "/media/ignacio/Datos/datasets/satelites/LandSat_tiles"
+    },
+    "query": {
+        "coordinates": null,
+        "enddate": null,
+        "force_search": false,
+        "inidate": null,
+        "platform": "Sentinel-2",
+        "producttype": "S2MSI1C"
+    },
+    "testing": {
+        "copy_original_bands": true,
+        "max_res": 60,
+        "output_file_format": "GTiff",
+        "output_path": null,
+        "roi_lon_lat": null,
+        "roi_x_y": [
+            0,
+            0,
+            1000,
+            1000
+        ],
+        "select_UTM": null
+    },
+    "training": {
+        "batchsize": 64,
+        "epochs": 100,
+        "lr": 0.0001
+    }
+}

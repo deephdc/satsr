@@ -1,0 +1,25 @@
+group                    key                           value                          
+===========================================================================
+general                  base_directory                .               
+general                  satellite                     landsat8        
+general                  tiles_directory               /media/ignacio/Datos/datasets/satelites/LandSat_tiles 
+---------------------------------------------------------------------------
+query                    coordinates                   None            
+query                    enddate                       None            
+query                    force_search                  False           
+query                    inidate                       None            
+query                    platform                      Sentinel-2      
+query                    producttype                   S2MSI1C         
+---------------------------------------------------------------------------
+testing                  copy_original_bands           True            
+testing                  max_res                       60              
+testing                  output_file_format            GTiff           
+testing                  output_path                   None            
+testing                  roi_lon_lat                   None            
+testing                  roi_x_y                       [0, 0, 1000, 1000] 
+testing                  select_UTM                    None            
+---------------------------------------------------------------------------
+training                 batchsize                     64              
+training                 epochs                        100             
+training                 lr                            0.0001          
+---------------------------------------------------------------------------
