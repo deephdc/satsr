@@ -1,5 +1,5 @@
 DEEP Open Catalogue: satsr
-=================
+==========================
 
 **Author/Mantainer:** [Ignacio Heredia](https://github.com/IgnacioHeredia) (CSIC)
 
@@ -84,7 +84,7 @@ Now you proceed to the next section to use you newly trained model to perfom sup
 
 ## Perform superresolution
 
-There are three possible ways to use the `PREDICT` method from the DEEPaaS API:
+There are two possible ways to use the `PREDICT` method from the DEEPaaS API:
 
 * supply to the `data` argument a path  pointing to a compressed file (`zip` or tarball) containing your satellite tile.
 * supply to the `url` argument an online url  of a compressed file (`zip` or tarball) containing your satellite tile.
@@ -98,7 +98,7 @@ The code in this project is based on the [original repo](https://github.com/lanh
 
 The main changes with respect to the original repo are that:
 
-* most of the code has been rewritten, restructured and cleaned up for better modularity, in order to make it plug-and-playable with
+* most of the code has been either rewritten, restructured or cleaned up for better modularity, in order to make it plug-and-playable with
   other satellites (like LandSat).
 * the code has been packaged into an installable Python package.
 * it has been made compatible with the [DEEPaaS API](http://docs.deep-hybrid-datacloud.eu/en/latest/user/overview/api.html).
