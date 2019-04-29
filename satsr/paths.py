@@ -32,7 +32,7 @@ def get_base_dir():
 
 
 def get_tiles_dir():
-    tiles_dir = CONF['general']['tiles_directory']
+    tiles_dir = CONF['training']['tiles_directory']
     if os.path.isabs(tiles_dir):
         return tiles_dir
     else:

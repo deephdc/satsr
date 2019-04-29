@@ -3,12 +3,15 @@ from distutils.dir_util import copy_tree
 import io
 import tarfile
 import zipfile
+import subprocess
+from multiprocessing import Process
+
 
 import numpy as np
 import imageio
 from keras import callbacks
 
-from satsr import paths
+from satsr import paths, config
 
 
 def create_dir_tree():
@@ -42,16 +45,16 @@ def backup_splits():
     copy_tree(src, dst)
 
 
-def get_callbacks():
-    callback_list = []
+def launch_tensorboard(port=6006):
+    subprocess.call(['tensorboard',
+                     '--logdir', '{}'.format(paths.get_logs_dir()),
+                     '--port', '{}'.format(port),
+                     '--host', '0.0.0.0'])
 
-    # filepath = out_path + model_nr + 'lr_{:.0e}.hdf5'.format(lr)
-    # callback_list.append(callbacks.ModelCheckpoint(filepath,
-    #                                                monitor='val_loss',
-    #                                                verbose=1,
-    #                                                save_best_only=True,
-    #                                                save_weights_only=False,
-    #                                                mode='auto'))
+
+def get_callbacks():
+    CONF = config.conf_dict
+    callback_list = []
 
     callback_list.append(callbacks.ReduceLROnPlateau(monitor='val_loss',
                                                      factor=0.5,
@@ -60,6 +63,29 @@ def get_callbacks():
                                                      epsilon=1e-6,
                                                      cooldown=20,
                                                      min_lr=1e-5))
+
+    if CONF['training']['use_tensorboard']:
+        callback_list.append(callbacks.TensorBoard(log_dir=paths.get_logs_dir(), write_graph=False))
+
+        # # Let the user launch Tensorboard
+        # print('Monitor your training in Tensorboard by executing the following comand on your console:')
+        # print('    tensorboard --logdir={}'.format(paths.get_logs_dir()))
+
+        # Run Tensorboard  on a separate Thread/Process on behalf of the user
+        port = os.getenv('monitorPORT', 6006)
+        port = int(port) if len(str(port)) >= 4 else 6006
+        subprocess.run(['fuser', '-k', '{}/tcp'.format(port)])  # kill any previous process in that port
+        p = Process(target=launch_tensorboard, args=(port,), daemon=True)
+        p.start()
+
+    if CONF['training']['ckpt_freq'] is not None:
+        callback_list.append(callbacks.ModelCheckpoint(
+            os.path.join(paths.get_checkpoints_dir(), 'epoch-{epoch:02d}.hdf5'),
+            verbose=1,
+            period=max(1, int(CONF['training']['ckpt_freq'] * CONF['training']['epochs']))))
+
+    if not callback_list:
+        callback_list = None
 
     return callback_list
 

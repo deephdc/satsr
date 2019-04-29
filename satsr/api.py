@@ -114,8 +114,7 @@ def predict_url(args):
                        roi_lon_lat=conf['testing']['roi_lon_lat'],
                        max_res=conf['testing']['max_res'],
                        copy_original_bands=conf['testing']['copy_original_bands'],
-                       output_file_format=conf['testing']['output_file_format'],
-                       select_UTM=conf['testing']['select_UTM'])
+                       output_file_format=conf['testing']['output_file_format'])
 
     # Stream the file back
     return flask.send_file(filename_or_fp=output_path,
@@ -145,8 +144,7 @@ def predict_data(args):
                        roi_lon_lat=conf['roi_lon_lat_test'],
                        max_res=conf['max_res_test'],
                        copy_original_bands=conf['copy_original_bands'],
-                       output_file_format=conf['output_file_format'],
-                       select_UTM=conf['select_UTM'])
+                       output_file_format=conf['output_file_format'])
 
     # Stream the file back
     return flask.send_file(filename_or_fp=output_path,

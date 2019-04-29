@@ -46,16 +46,14 @@ patch_sizes = {30: 128}
 borders = {30: 8}
 
 
-def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=30, select_UTM=''):
+def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=30):
     """
-
     Parameters
     ----------
     tile_path : str
     roi_x_y : list of ints
     roi_lon_lat : list of floats
     max_res : int
-    select_UTM : str
 
     Returns
     -------

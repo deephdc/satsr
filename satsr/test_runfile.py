@@ -37,7 +37,7 @@ def load_models():
 
 
 def test(tile_path, max_res, output_path=None, roi_x_y=None, roi_lon_lat=None, copy_original_bands=True,
-         output_file_format='GTiff', select_UTM=''):
+         output_file_format='GTiff'):
 
     # Load models if needed
     if (models is None) or (models_sat != config.conf_dict['general']['satellite']):
@@ -61,7 +61,7 @@ def test(tile_path, max_res, output_path=None, roi_x_y=None, roi_lon_lat=None, c
 
     # Load bands
     data_bands, coord = main_sat.read_bands()(tile_path=tile_path, max_res=max_res, roi_x_y=roi_x_y,
-                                              roi_lon_lat=roi_lon_lat, select_UTM=select_UTM)
+                                              roi_lon_lat=roi_lon_lat)
 
     # Check image
     min_res = min(data_bands.keys())

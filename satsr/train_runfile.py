@@ -13,8 +13,8 @@ import time
 import os
 from datetime import datetime
 import json
+import shutil
 
-import numpy as np
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from keras.optimizers import Nadam
@@ -30,33 +30,33 @@ from satsr.utils import misc, data_utils, model_utils
 # full image (do this for both TRAINING and PREDICT)
 # TODO: Implement resuming training from weigths
 # TODO: Move to tf.keras --> solve problems with channels_last
-# TODO: Add callbacks
-# TODO: Try what happens with empty validation/training files
 # TODO: Change test to behave like train: If max_res is None it will super-resolve all bands if not only the bands of
 # that resolution
-# TODO: Move tiles_directory parameter to training group
-# TODO: Remove the select UTM option
+# TODO: Move pixel_max_value from patches.py to main_sat.py
+# TODO: Define no_data_pixel_value in main_sat.py to use in test function
 
 
 def train_fn(TIMESTAMP, CONF):
 
-    # ############# REMOVE #################################
+    # # ############# REMOVE #################################
     # CONF['general']['satellite'] = 'sentinel2'
-
-    # CONF['training']['overwrite'] = True
+    #
+    # CONF['training']['use_tensorboard'] = True
+    #
+    # CONF['training']['overwrite'] = False
     # CONF['training']['epochs'] = 100
     # CONF['training']['batchsize'] = 64
     #
     # CONF['training']['max_res'] = 60
     # CONF['training']['num_patches'] = 30
     # CONF['training']['roi_x_y'] = [2000, 2000, 6000, 6000]
-    # CONF['general']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/S2_tiles/L1C'
-    #
-    # # CONF['training']['max_res'] = 30
-    # # CONF['training']['num_patches'] = 8000
-    # # CONF['training']['roi_x_y'] = [4000, 4000, 8000, 8000]
-    # # CONF['general']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/LandSat_tiles'
-    # ########################################################
+    # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/Sentinel2_tiles/L1C'
+    # #
+    # # # CONF['training']['max_res'] = 30
+    # # # CONF['training']['num_patches'] = 8000
+    # # # CONF['training']['roi_x_y'] = [4000, 4000, 8000, 8000]
+    # # # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/LandSat_tiles'
+    # # ########################################################
 
     if CONF['training']['max_res'] is None:
         CONF['training']['max_res'] = max(main_sat.res_to_bands().keys())
@@ -87,28 +87,22 @@ def train_fn(TIMESTAMP, CONF):
     model.count_params()
     # model.summary()
 
-    callbacks_list = None  # misc.get_callbacks() #TODO
-
-    # Create data generator for train and val sets
+    # Create data generator for the training set
     train_tiles = data_utils.load_data_splits(splits_dir=paths.get_splits_dir(),
                                               split_name='train')
-    val_tiles = data_utils.load_data_splits(splits_dir=paths.get_splits_dir(),
-                                            split_name='val')
 
-    # ############# REMOVE #################################
-    # train_tiles = train_tiles[:2]
-    # val_tiles = val_tiles[0]
-    # ########################################################
+    # ########### REMOVE ##############
+    # train_tiles = train_tiles[:5]
+    # #################################
 
     if CONF['training']['overwrite']:
+        # Clear directory from previous patches
+        for tile_name in os.listdir(paths.get_patches_dir()):
+            tile_path = os.path.join(paths.get_patches_dir(), tile_name)
+            shutil.rmtree(tile_path)
+
         data_utils.create_patches(tiles=train_tiles,
-                                  tiles_dir=CONF['general']['tiles_directory'],
-                                  save_dir=paths.get_patches_dir(),
-                                  roi_x_y=CONF['training']['roi_x_y'],
-                                  max_res=max_res,
-                                  num_patches=CONF['training']['num_patches'])
-        data_utils.create_patches(tiles=val_tiles,
-                                  tiles_dir=CONF['general']['tiles_directory'],
+                                  tiles_dir=CONF['training']['tiles_directory'],
                                   save_dir=paths.get_patches_dir(),
                                   roi_x_y=CONF['training']['roi_x_y'],
                                   max_res=max_res,
@@ -117,9 +111,28 @@ def train_fn(TIMESTAMP, CONF):
     train_gen = data_utils.data_sequence(tiles=train_tiles,
                                          batch_size=CONF['training']['batchsize'],
                                          max_res=max_res)
-    val_gen = data_utils.data_sequence(tiles=val_tiles,
-                                       batch_size=CONF['training']['batchsize'],
-                                       max_res=max_res)
+
+    # Create data generator for the validation set
+    if 'val.txt' in os.listdir(paths.get_splits_dir()):
+        val_tiles = data_utils.load_data_splits(splits_dir=paths.get_splits_dir(),
+                                                split_name='val')
+
+        if CONF['training']['overwrite']:
+            data_utils.create_patches(tiles=val_tiles,
+                                      tiles_dir=CONF['training']['tiles_directory'],
+                                      save_dir=paths.get_patches_dir(),
+                                      roi_x_y=CONF['training']['roi_x_y'],
+                                      max_res=max_res,
+                                      num_patches=CONF['training']['num_patches'])
+
+        val_gen = data_utils.data_sequence(tiles=val_tiles,
+                                           batch_size=CONF['training']['batchsize'],
+                                           max_res=max_res)
+        val_steps = val_gen.__len__()
+
+    else:
+        val_gen, val_steps = None, None
+
     # Launch the training
     t0 = time.time()
 
@@ -128,8 +141,9 @@ def train_fn(TIMESTAMP, CONF):
                                   epochs=CONF['training']['epochs'],
                                   initial_epoch=0,
                                   validation_data=val_gen,
-                                  validation_steps=val_gen.__len__(),
+                                  validation_steps=val_steps,
                                   verbose=1,
+                                  callbacks=misc.get_callbacks(),
                                   max_queue_size=5, workers=0, use_multiprocessing=False)
 
     # Saving everything

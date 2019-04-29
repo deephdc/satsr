@@ -120,6 +120,8 @@ class data_sequence(Sequence):
         self.label_res = np.amax(resolutions)  # resolution of the labels
         inputs, labels = self.tiles_to_samples(tiles, patches_dir, resolutions)
         assert len(inputs) == len(labels)
+        assert len(inputs) != 0, "Data generator has length zero. Please provide some data for training/validation." \
+                                 "If you don't want to use validation then remove the empty val.txt file."
 
         self.inputs = inputs
         self.labels = labels

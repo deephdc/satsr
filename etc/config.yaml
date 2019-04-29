@@ -24,12 +24,6 @@ general:
           directory.
           If path is relative it will be appended to the package path.
 
-  tiles_directory:
-    value: "data/tiles"
-    type: "str"
-    help: >
-          Base directory for the satellite's tiles. If the path is relative, it will be appended to the package path.
-
   satellite:
     value: "sentinel2"
     type: "str"
@@ -44,6 +38,12 @@ general:
 #####################################################
 
 training:
+
+  tiles_directory:
+    value: "data/tiles"
+    type: "str"
+    help: >
+          Base directory for the satellite's tiles. If the path is relative, it will be appended to the package path.
 
   epochs:
     value: 30
@@ -95,6 +95,21 @@ training:
     help: >
       Number of patches to take per image. If set to None, the number of patches will be proportional to the size of the
       image.
+
+  ckpt_freq:
+    value:
+    type: "float"
+    range: [0, 1]
+    help: >
+          Frequency of the checkpoints (Float between 0 and 1). If None there will be no checkpoints saved. If 0 there
+          will be 1 checkpoint per epoch. For example 0.1 means there will be 10 ckpts during the training.
+
+  use_tensorboard:
+    value: False
+    type: "bool"
+    help: >
+          Whether to use or not Tensorboard for monitoring the training
+
 
 #####################################################
 #  Options about your testing routine
@@ -158,9 +173,3 @@ testing:
     help: >
           Filepath of the output. If None the output file name will be the same as in the input tile and the output folder
           will be `./data/test_files/outputs`
-
-  select_UTM:
-    value:
-    type: "str"
-    help: >
-          Select a specific UTM if several are available
