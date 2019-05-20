@@ -1,0 +1,30 @@
+{
+    "general": {
+        "satellite": "modis"
+    },
+    "testing": {
+        "copy_original_bands": true,
+        "max_res_test": null,
+        "output_file_format": "GTiff",
+        "output_path": null,
+        "roi_lon_lat_test": null,
+        "roi_x_y_test": [
+            0,
+            0,
+            1000,
+            1000
+        ]
+    },
+    "training": {
+        "batchsize": 64,
+        "ckpt_freq": null,
+        "epochs": 100,
+        "max_res": 1000,
+        "num_patches": null,
+        "overwrite": true,
+        "patches_directory": "/media/ignacio/Datos/datasets/satelites/patches",
+        "roi_x_y": null,
+        "tiles_directory": "/media/ignacio/Datos/datasets/satelites/modis_tiles/MOD09",
+        "use_tensorboard": false
+    }
+}

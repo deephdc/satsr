@@ -1,0 +1,35 @@
+{
+    "general": {
+        "base_directory": ".",
+        "satellite": "viirs"
+    },
+    "testing": {
+        "copy_original_bands": true,
+        "max_res_test": 60,
+        "output_file_format": "GTiff",
+        "output_path": null,
+        "roi_lon_lat_test": null,
+        "roi_x_y_test": [
+            0,
+            0,
+            1000,
+            1000
+        ]
+    },
+    "training": {
+        "batchsize": 64,
+        "ckpt_freq": null,
+        "epochs": 100,
+        "max_res": 750,
+        "num_patches": 10000,
+        "overwrite": true,
+        "roi_x_y": [
+            0,
+            0,
+            5000,
+            5000
+        ],
+        "tiles_directory": "/media/ignacio/Datos/datasets/satelites/viirs_tiles/",
+        "use_tensorboard": false
+    }
+}

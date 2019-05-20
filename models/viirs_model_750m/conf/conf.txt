@@ -1,0 +1,22 @@
+group                    key                           value                          
+===========================================================================
+general                  base_directory                .               
+general                  satellite                     viirs           
+---------------------------------------------------------------------------
+testing                  copy_original_bands           True            
+testing                  max_res_test                  60              
+testing                  output_file_format            GTiff           
+testing                  output_path                   None            
+testing                  roi_lon_lat_test              None            
+testing                  roi_x_y_test                  [0, 0, 1000, 1000] 
+---------------------------------------------------------------------------
+training                 batchsize                     64              
+training                 ckpt_freq                     None            
+training                 epochs                        100             
+training                 max_res                       750             
+training                 num_patches                   10000           
+training                 overwrite                     True            
+training                 roi_x_y                       [0, 0, 5000, 5000] 
+training                 tiles_directory               /media/ignacio/Datos/datasets/satelites/viirs_tiles/ 
+training                 use_tensorboard               False           
+---------------------------------------------------------------------------
