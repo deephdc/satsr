@@ -42,7 +42,8 @@ In the case of Sentinel 2, we upsample 60m and 20m resolution bands to 10m resol
 
 ### LandSat 8
 
-In the case of LandSat 8 we upsample low resolution 30m bands to 15m resolution. 
+In the case of LandSat 8 we upsample low resolution 30m bands to 15m resolution.
+
 | Resolutions | Band names                                                   |
 |:-----------:|--------------------------------------------------------------|
 |     15m     | 'B8'                                                         |
