@@ -1,28 +1,35 @@
 {
     "general": {
         "base_directory": ".",
-        "tiles_directory": "/media/ignacio/Datos/datasets/satelites/S2_tiles"
-    },
-    "query": {
-        "coordinates": null,
-        "enddate": null,
-        "force_search": false,
-        "inidate": null,
-        "platform": "Sentinel-2",
-        "producttype": "S2MSI1C"
+        "satellite": "sentinel2"
     },
     "testing": {
         "copy_original_bands": true,
+        "max_res_test": 60,
         "output_file_format": "GTiff",
         "output_path": null,
-        "roi_lon_lat": null,
-        "roi_x_y": [
+        "roi_lon_lat_test": null,
+        "roi_x_y_test": [
             0,
             0,
             1000,
             1000
+        ]
+    },
+    "training": {
+        "batchsize": 64,
+        "ckpt_freq": null,
+        "epochs": 100,
+        "max_res": 20,
+        "num_patches": 10000,
+        "overwrite": true,
+        "roi_x_y": [
+            1000,
+            1000,
+            6000,
+            6000
         ],
-        "run_60": true,
-        "select_UTM": null
+        "tiles_directory": "/media/ignacio/Datos/datasets/satelites/Sentinel2_tiles/L1C",
+        "use_tensorboard": false
     }
 }

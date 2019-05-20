@@ -1,20 +1,22 @@
 group                    key                           value                          
 ===========================================================================
-general                  base_directory                .               
-general                  tiles_directory               /media/ignacio/Datos/datasets/satelites/S2_tiles 
----------------------------------------------------------------------------
-query                    coordinates                   None            
-query                    enddate                       None            
-query                    force_search                  False           
-query                    inidate                       None            
-query                    platform                      Sentinel-2      
-query                    producttype                   S2MSI1C         
+general                  satellite                     sentinel2       
 ---------------------------------------------------------------------------
 testing                  copy_original_bands           True            
+testing                  max_res_test                  None            
 testing                  output_file_format            GTiff           
 testing                  output_path                   None            
-testing                  roi_lon_lat                   None            
-testing                  roi_x_y                       [0, 0, 1000, 1000] 
-testing                  run_60                        True            
-testing                  select_UTM                    None            
+testing                  roi_lon_lat_test              None            
+testing                  roi_x_y_test                  [0, 0, 1000, 1000] 
+---------------------------------------------------------------------------
+training                 batchsize                     64              
+training                 ckpt_freq                     None            
+training                 epochs                        100             
+training                 max_res                       60              
+training                 num_patches                   10000           
+training                 overwrite                     True            
+training                 patches_directory             /media/ignacio/Datos/datasets/satelites/patches 
+training                 roi_x_y                       [1000, 1000, 6000, 6000] 
+training                 tiles_directory               /media/ignacio/Datos/datasets/satelites/sentinel2_tiles/L1C 
+training                 use_tensorboard               False           
 ---------------------------------------------------------------------------
