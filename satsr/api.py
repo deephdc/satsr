@@ -38,7 +38,7 @@ def catch_error(f):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            raise e
+            raise BadRequest(e)
     return wrap
 
 
@@ -53,12 +53,8 @@ def update_user_conf(user_args):
             if g_key in user_args:
                 g_val['value'] = json.loads(user_args[g_key])
 
-    # Check the configuration
-    try:
-        config.check_conf(conf=CONF)
-    except Exception as e:
-        raise BadRequest(e)
-
+    # Check and save the configuration
+    config.check_conf(conf=CONF)
     config.conf_dict = config.get_conf_dict(conf=CONF)
 
 

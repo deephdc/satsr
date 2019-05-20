@@ -53,7 +53,7 @@ def create_patches(tiles, max_res, tiles_dir=None, save_dir=None, roi_x_y=None, 
         tiles = [tiles]
 
     for tile in tiles:
-        print('Creating patches for {} ...'.format(tile))
+        print('\n Creating patches for {} ...'.format(tile))
         tile_path = os.path.join(tiles_dir, tile)
 
         # Clearing previous patches (if any)
@@ -64,16 +64,22 @@ def create_patches(tiles, max_res, tiles_dir=None, save_dir=None, roi_x_y=None, 
 
         data_bands, coord = main_sat.read_bands()(tile_path=tile_path, roi_x_y=roi_x_y, max_res=max_res)
 
+        # Normalize pixel values and put image in float32 format
+        for res in data_bands.keys():
+            data_bands[res] = data_bands[res].astype(np.float32)
+            data_bands[res] = (data_bands[res] - main_sat.min_val()) / (main_sat.max_val() - main_sat.min_val())
+
+        # Define the scales of the problem
         resolutions = data_bands.keys()
         max_res, min_res = max(resolutions), min(resolutions)
         scales = {res: int(res / min_res) for res in resolutions}  # scale with respect to minimum resolution  e.g. {10: 1, 20: 2, 60: 6}
         inv_scales = {res: int(max_res / res) for res in resolutions}  # scale with respect to maximum resolution e.g. {10: 6, 20: 3, 60: 1} or {10: 2, 20: 1}
         scale = scales[max_res]
 
-        chan3 = data_bands[min_res][:, :, 0]
-        vis = (chan3 < 1).astype(np.int)
-        if np.sum(vis) > 0:
-            print('The selected image has some blank pixels')
+        # Check if image has fill_value pixel
+        tmp_band = data_bands[min_res][:, :, 0]
+        if np.sum(tmp_band == main_sat.fill_val()) > 0:
+            print('The selected image has some [fill_value] pixels')
             # sys.exit()
 
         # Crop GT maps so that they can be correctly downscaled
@@ -99,8 +105,7 @@ class data_sequence(Sequence):
     TODO: Add sample weights on request
     """
 
-    def __init__(self, tiles, max_res, batch_size=32, patches_dir=paths.get_patches_dir(), scale=2000,
-                 shuffle=True):
+    def __init__(self, tiles, max_res, batch_size=32, patches_dir=None, shuffle=True):
         """
         Parameters are the same as in the data_generator function
 
@@ -110,14 +115,16 @@ class data_sequence(Sequence):
         resolutions : list of ints
         batch_size : int
         patches_dir : str
-        scale : int
         shuffle : bool
         """
         if isinstance(tiles, str):
             tiles = [tiles]
 
+        # Create list of inputs and labels
+        patches_dir = paths.get_patches_dir() if patches_dir is None else patches_dir
         resolutions = [res for res in main_sat.res_to_bands().keys() if res <= max_res]
         self.label_res = np.amax(resolutions)  # resolution of the labels
+
         inputs, labels = self.tiles_to_samples(tiles, patches_dir, resolutions)
         assert len(inputs) == len(labels)
         assert len(inputs) != 0, "Data generator has length zero. Please provide some data for training/validation." \
@@ -125,7 +132,6 @@ class data_sequence(Sequence):
 
         self.inputs = inputs
         self.labels = labels
-        self.scale = scale
         self.resolutions = [str(res) for res in sorted(resolutions)]
         self.batch_size = np.amin((batch_size, len(inputs)))
         self.shuffle = shuffle

@@ -45,6 +45,11 @@ band_desc = {'B1': 'B1 Ultra Blue (coastal/aerosol) [435nm-451nm]',
 patch_sizes = {30: 128}
 borders = {30: 8}
 
+# Define pixel values
+max_val = 2**16
+min_val = 1
+fill_val = 0
+
 
 def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=30):
     """
@@ -60,7 +65,7 @@ def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=30):
     A dict where the keys are int of the resolutions and values are numpy arrays (H, W, N)
     """
 
-    print('Print performing inference with {}'.format(tile_path))
+    print('Loading {}'.format(tile_path))
 
     # Select bands
     resolutions = [res for res in res_to_bands.keys() if res <= max_res]

@@ -11,7 +11,7 @@ from satsr import config
 
 
 # User configuration
-satellite_name = 'Sentinel'
+satellite_name = 'MODIS'
 inidate = "2019-01-21T18:00:14Z"
 enddate = "2019-02-21T18:00:14Z"
 keep_first = True
@@ -26,7 +26,7 @@ if satellite_name == 'Sentinel':
             'enddate': enddate,
             'coordinates': None,
             'platform': 'Sentinel-2',
-            'producttype': 'S2MSI2A', #'S2MSI1C'
+            'producttype': 'S2MSI2A',  # 'S2MSI1C'
             'username': credentials['user'],
             'password': credentials['password']}
 
@@ -42,6 +42,40 @@ elif satellite_name == 'LandSat':
             'producttype': 'LANDSAT_8_C1',
             'username': credentials['user'],
             'password': credentials['password']}
+
+elif satellite_name == 'VIIRS':
+
+    from satsr.satellites.laads_download import Satellite
+
+    output_folder = '/media/ignacio/Datos/datasets/satelites/viirs_tiles'
+    args = {'inidate': inidate,
+            'enddate': enddate,
+            'coordinates': None,
+            'producttype': 'VNP09',
+            'collection': 5000,
+            'username': None,  # credentials not needed
+            'password': None}
+
+elif satellite_name == 'MODIS':
+    # List of product types:
+    # ----------------------
+    # Level 1B:
+    #   * 250m: MOD02HKM
+    #   * 750m: MOD02QKM
+    #   * 1km:  MOD021KM
+    # Level 2A: MOD09
+
+    from satsr.satellites.laads_download import Satellite
+
+    output_folder = '/media/ignacio/Datos/datasets/satelites/modis_tiles'
+    args = {'inidate': inidate,
+            'enddate': enddate,
+            'coordinates': None,
+            'producttype': 'MOD09',
+            'collection': 6,
+            'username': None,  # credentials not needed
+            'password': None}
+
 
 else:
     raise Exception('Invalid satellite name')
@@ -66,6 +100,9 @@ regions = {"CdP": {"id": 210788, "coordinates": {"W": -2.830, "S": 41.820, "E": 
            "Japon": {"id": 187392, "coordinates": {"W": 137.460, "S": 35.587, "E": 141.360, "N": 36.813}},
            "Alemania": {"id": 187392, "coordinates": {"W": 9.938, "S": 50.467, "E": 9.978, "N": 50.486}}}
 
+########## REMOVE ############
+# regions = {'CdP': regions['CdP']}
+##############################
 
 # Search and download
 search_results = []

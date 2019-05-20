@@ -16,18 +16,10 @@
 
 general:
 
-  base_directory:
-    value: "."
-    type: "str"
-    help: >
-          Base directory for data and models. All the data that will be read and written will be done within this
-          directory.
-          If path is relative it will be appended to the package path.
-
   satellite:
     value: "sentinel2"
     type: "str"
-    choices: ["sentinel2", "landsat8"]
+    choices: ["sentinel2", "landsat8", "viirs", "modis"]
     help: >
           Name of the satellite you want to use. Satellite options, as well as instructions on how to add additional
           satellites, are defined in /satsr/main_sat.py.
@@ -40,10 +32,21 @@ general:
 training:
 
   tiles_directory:
-    value: "data/tiles"
+    value:
     type: "str"
     help: >
-          Base directory for the satellite's tiles. If the path is relative, it will be appended to the package path.
+          Base directory for the satellite's tiles. Relative paths of the tiles defined in [train.txt/val.txt] are
+          defined with respect to this path.
+          If set to `None`, the default will be "./satsr/data/tiles".
+
+  patches_directory:
+    value:
+    type: "str"
+    help: >
+          Base directory to save the satellite's tiles' patches. If the training involves a considerable amount of data,
+          the user might consider pointing this path to a folder in an external drive, as patches can easily build to
+          100's of GB.
+          If set to `None`, the default will be "./satsr/data/patches".
 
   epochs:
     value: 30
@@ -63,14 +66,23 @@ training:
     help: >
           Resolution to super-resolve with the model. If None we will train N models to super-resolve the N possible
           resolutions of the satellite.
+          The options for the different satellites are:
+
+               * Sentinel2: [20, 60]
+
+               * LandSat8: [30]
+
+               * VIIRS: [750]
+
+               * MODIS: [500, 1000]
 
   roi_x_y:
     value: [0,0,1000,1000]
     type: "list"
     help: >
           Sets the region of interest to extract as pixels locations on the 10m bands.
-          Use this syntax: [x_1,y_1,x_2,y_2]. The order of points 1 and 2 does not matter.
-          If set to None (and roi_lon_lat also None), the whole image will be superresolved.
+          Use this syntax: `[x_1,y_1,x_2,y_2]`. The order of points 1 and 2 does not matter.
+          If set to `None` (and `roi_lon_lat` also `None`), the whole image will be superresolved.
 
           Example:
           `[0,0,1000,1000]`
@@ -122,8 +134,8 @@ testing:
     type: "list"
     help: >
           Sets the region of interest to extract as pixels locations on the 10m bands.
-          Use this syntax: [x_1,y_1,x_2,y_2]. The order of points 1 and 2 does not matter.
-          If set to None (and roi_lon_lat also None), the whole image will be superresolved.
+          Use this syntax: `[x_1,y_1,x_2,y_2]`. The order of points 1 and 2 does not matter.
+          If set to `None` (and `roi_lon_lat` also `None`), the whole image will be superresolved.
 
           Example:
           `[0,0,1000,1000]`
@@ -140,19 +152,24 @@ testing:
     value:
     type: "list"
     help: >
-          Sets the region of interest in coordinates. Use this syntax: x_1,y_1,x_2,y_2.
-          Use this syntax: [x_1,y_1,x_2,y_2]. The order of points 1 and 2 does not matter.
-          If set to None (and roi_x_y also None), the whole image will be superresolved.
+          Sets the region of interest in coordinates.
+          Use this syntax: `[x_1,y_1,x_2,y_2]`. The order of points 1 and 2 does not matter.
+          If set to `None` (and `roi_x_y` also `None`), the whole image will be superresolved.
 
   max_res_test:
-    value: 60
+    value:
     type: "int"
     help: >
-          Maximal resolution bands to use to make inference.
-          In the case of Sentinel2:
-          * if max_res=60 it will super-resolve the 20m and 60m bands (B1,B2,B3,B4,B5,B6,B7,B8,B8A,B9,B11,B12).
-          * if max_res=20 it will super-resolve only the 20m bands (B2,B3,B4,B5,B6,B7,B8,B8A,B11,B12).
-          Band B10 is to noisy and is not super-resolved.
+          Maximal resolution bands to use to make inference. If set to `None`, the super-resolution will be performed
+          on all possible bands.The options for the different satellites are:
+
+          * Sentinel2: [20, 60]
+
+          * LandSat8: [30]
+
+          * VIIRS: [750]
+
+          * MODIS: [500, 1000]
 
   copy_original_bands:
     value: True

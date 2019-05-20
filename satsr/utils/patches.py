@@ -1,25 +1,27 @@
 from __future__ import division
 from random import randrange
-import os
 from math import ceil
+import os
 
 import numpy as np
-from skimage.transform import resize
 import skimage.measure
+from skimage.transform import resize
 from scipy.ndimage.filters import gaussian_filter
+from tqdm import tqdm
 
+from satsr import main_sat
 
-max_pixel = 2**16  # maximum possible pixel value
-norm = 2000  # divide the pixel value to have a more normalized distribution
+# max_pixel = 2**16  # maximum possible pixel value
+# norm = 2000  # divide the pixel value to have a more normalized distribution
 
 
 def interp_patches(lr_image, hr_image_shape):
     interp = np.zeros((lr_image.shape[0:2] + hr_image_shape[2:4])).astype(np.float32)
     for k in range(lr_image.shape[0]):
         for w in range(lr_image.shape[1]):
-            interp[k, w] = resize(image=lr_image[k, w] / max_pixel,
+            interp[k, w] = resize(image=lr_image[k, w],
                                   output_shape=hr_image_shape[2:4],
-                                  mode='reflect') * max_pixel  # bilinear
+                                  mode='reflect')  # bilinear
     return interp
 
 
@@ -30,9 +32,9 @@ def upsample_patches(lr_patch, output_shape):
     """
     up_patches = np.zeros((lr_patch.shape[0], *output_shape)).astype(np.float32)
     for k in range(lr_patch.shape[0]):
-        up_patches[k] = resize(image=lr_patch[k] / max_pixel,
+        up_patches[k] = resize(image=lr_patch[k],
                                output_shape=output_shape,
-                               mode='reflect') * max_pixel
+                               mode='reflect')
     return up_patches
 
 
@@ -43,12 +45,15 @@ def downPixelAggr(img, SCALE=2):
     if len(img.shape) == 2:
         img = np.expand_dims(img, axis=-1)
     img_blur = np.zeros(img.shape)
+
     # Filter the image with a Gaussian filter
     for i in range(0, img.shape[2]):
         img_blur[:, :, i] = gaussian_filter(img[:, :, i], 1/SCALE)
+
     # New image dims
     new_dims = tuple(s//SCALE for s in img.shape)
     img_lr = np.zeros(new_dims[0:2]+(img.shape[-1],))
+
     # Iterate through all the image channels with avg pooling (pixel aggregation)
     for i in range(0, img.shape[2]):
         img_lr[:, :, i] = skimage.measure.block_reduce(img_blur[:, :, i], (SCALE, SCALE), np.mean)
@@ -65,9 +70,9 @@ def get_test_patches(data_bands, patch_size=128, border=4, interp=True):
     scales = {res: int(res/min_res) for res in resolutions}  # scale with respect to minimum resolution  e.g. {10: 1, 20: 2, 60: 6}
     inv_scales = {res: int(max_res/res) for res in resolutions}  # scale with respect to maximum resolution e.g. {10: 6, 20: 3, 60: 1} or {10: 2, 20: 1}
 
-    # Normalize pixel values
-    for res in resolutions:
-        data_bands[res] = data_bands[res] / norm
+    # # Normalize pixel values
+    # for res in resolutions:
+    #     data_bands[res] = data_bands[res] / norm
 
     # Adapt the borders and patchsizes for each scale
     patch_size = int(patch_size/scales[max_res]) * scales[max_res]  # make patchsize compatible with all scales
@@ -141,15 +146,15 @@ def save_random_patches(gt, lr, save_path, num_patches=None):
     PATCH_SIZE_LR = (16, 16)
 
     if num_patches is None:
-        alpha = 5  # multiplier to scale number of patches wrt the size of the image
-        num_patches = alpha * gt[:, :, 0].size / 16**2
+        alpha = 1  # multiplier to scale number of patches wrt the size of the image
+        num_patches = int(alpha * gt[:, :, 0].size / 16**2)
 
-    # Normalize pixel values
-    gt = gt / norm
-    for res in resolutions:
-        lr[res] = lr[res] / norm
+    # # Normalize pixel values
+    # gt = gt / norm
+    # for res in resolutions:
+    #     lr[res] = lr[res] / norm
 
-    for i, crop in enumerate(range(0, num_patches)):
+    for i, crop in enumerate(tqdm(range(0, num_patches))):
 
         found = False
         count = 0
@@ -225,10 +230,10 @@ def recompose_images(a, border, size=None):
                 images[:, ypoint:ypoint+patch_size, xpoint:xpoint+patch_size] = a[current_patch, :, border:a.shape[2]-border, border:a.shape[3]-border]
                 current_patch += 1
 
-    # Undo the pixel values normalization
-    images = images * norm
-
-    # Clip the image to allowed pixel values
-    images = np.clip(images, a_min=0, a_max=max_pixel)
+    # # Undo the pixel values normalization
+    # images = images * norm
+    #
+    # # Clip the image to allowed pixel values
+    # images = np.clip(images, a_min=0, a_max=max_pixel)
 
     return images.transpose((1, 2, 0))

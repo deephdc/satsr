@@ -13,15 +13,19 @@ def load_modules():
     print('Loading satellite functions for {}...'.format(selected_sat))
 
     global sat_fns
-    global sat_download
 
     if selected_sat == 'sentinel2':
         import satsr.satellites.sentinel2 as sat_fns
-        import satsr.satellites.sentinel_download as sat_download
 
     elif selected_sat == 'landsat8':
         import satsr.satellites.landsat8 as sat_fns
-        import satsr.satellites.landsat_download as sat_download
+
+    elif selected_sat == 'viirs':
+        import satsr.satellites.viirs as sat_fns
+
+    elif selected_sat == 'modis':
+        import satsr.satellites.modis as sat_fns
+
 
     else:
         raise Exception('Invalid satellite name')
@@ -42,6 +46,36 @@ def check_reloading():
 
 # List of objects used by the package
 # ===================================
+
+# Variables
+# ---------
+
+def max_val():
+    """
+    User defined
+    Maximum pixel value allowed for the bands
+    """
+    check_reloading()
+    return getattr(sat_fns, 'max_val')
+
+
+def min_val():
+    """
+    User defined
+    Minimum pixel value allowed for the bands
+    """
+    check_reloading()
+    return getattr(sat_fns, 'min_val')
+
+
+def fill_val():
+    """
+    User defined
+    Fill pixel value for the bands. This must be an integer value (not a np.nan)
+    """
+    check_reloading()
+    return getattr(sat_fns, 'fill_val')
+
 
 # Dictionaries
 # ------------
@@ -112,15 +146,3 @@ def read_bands():
     """
     check_reloading()
     return getattr(sat_fns, 'read_bands')
-
-
-# Classes
-# -------
-
-def Satellite():
-    """
-    User defined
-    """
-    check_reloading()
-    return getattr(sat_download, 'Satellite')
-

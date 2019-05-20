@@ -19,25 +19,19 @@ CONF = config.get_conf_dict()
 timestamp = datetime.now().strftime('%Y-%m-%d_%H%M%S')
 
 
+# General paths
+# -------------
+
 def get_timestamp():
     return timestamp
 
 
 def get_base_dir():
-    base_dir = CONF['general']['base_directory']
-    if os.path.isabs(base_dir):
-        return base_dir
-    else:
-        return os.path.abspath(os.path.join(homedir, base_dir))
+    return homedir
 
 
-def get_tiles_dir():
-    tiles_dir = CONF['training']['tiles_directory']
-    if os.path.isabs(tiles_dir):
-        return tiles_dir
-    else:
-        return os.path.abspath(os.path.join(homedir, tiles_dir))
-
+# Data paths
+# ----------
 
 def get_data_dir():
     return os.path.join(get_base_dir(), "data")
@@ -51,9 +45,34 @@ def get_test_dir():
     return os.path.join(get_data_dir(), "test")
 
 
-def get_patches_dir():
-    return os.path.join(get_data_dir(), "patches")
+def get_tiles_dir():
+    tiles_dir = CONF['training']['tiles_directory']
 
+    if tiles_dir is None:
+        return os.path.join(get_data_dir(), "tiles")
+
+    else:
+        if os.path.isabs(tiles_dir):
+            return tiles_dir
+        else:
+            raise Exception("`tiles_directory` should be an absolute path.")
+
+
+def get_patches_dir():
+    patches_dir = CONF['training']['patches_directory']
+
+    if patches_dir is None:
+        return os.path.join(get_data_dir(), "patches")
+
+    else:
+        if os.path.isabs(patches_dir):
+            return patches_dir
+        else:
+            raise Exception("`patches_directory` should be an absolute path.")
+
+
+# Model paths
+# ----------
 
 def get_models_dir():
     return os.path.join(get_base_dir(), "models")
@@ -86,6 +105,9 @@ def get_ts_splits_dir():
 def get_predictions_dir():
     return os.path.join(get_timestamped_dir(), "predictions")
 
+
+# Other
+# -----
 
 def get_dirs():
     return {'base dir': get_base_dir(),

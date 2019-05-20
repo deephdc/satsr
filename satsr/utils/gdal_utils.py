@@ -65,31 +65,6 @@ def lonlat_to_xy(lon, lat, ds):
     return int(x), int(y)
 
 
-def get_short_description(description, output_file_format='GTiff'):
-    """
-    Get a short band description from full description
-    """
-    m = re.match("(.*?), central wavelength (\d+) nm", description)
-    if m:
-        return m.group(1) + " (" + m.group(2) + " nm)"
-    # Some HDR restrictions... ENVI band names should not include commas
-    if output_file_format == 'ENVI' and ',' in description:
-        pos = description.find(',')
-        return description[:pos] + description[(pos + 1):]
-    return description
-
-
-def get_short_name(description):
-    """
-    Get short band name from full description
-    """
-    if ',' in description:
-        return description[:description.find(',')]
-    if ' ' in description:
-        return description[:description.find(' ')]
-    return description[:3]
-
-
 def check_gdal_format(file_format):
     """
     Check if a file format can be written with GDAL
@@ -127,6 +102,9 @@ def save_gdal(output_path, bands, descriptions, geotransform, geoprojection, fil
     path_dir = os.path.dirname(output_path)
     if not os.path.exists(path_dir):
         os.makedirs(path_dir)
+
+    # Check file format
+    assert check_gdal_format(file_format), 'File format not supported by GDAL (check https://www.gdal.org/formats_list.html)'
 
     # Create GDAL dataset
     driver = gdal.GetDriverByName(file_format)

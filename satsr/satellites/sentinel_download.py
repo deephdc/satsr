@@ -117,13 +117,14 @@ class Satellite:
         for r in results:
             url, tile_id = r['link'][0]['href'], r['title']
             print('Downloading {} ...'.format(tile_id))
-            response = self.session.get(url, stream=True, allow_redirects=True, auth=(self.credentials['username'],
-                                                                                      self.credentials['password']))
+
             save_dir = os.path.join(output_folder, '{}.SAFE'.format(tile_id))
             if os.path.isdir(save_dir):
                 print('File already downloaded')
                 continue
 
+            response = self.session.get(url, stream=True, allow_redirects=True, auth=(self.credentials['username'],
+                                                                                      self.credentials['password']))
             tile_path = misc.open_compressed(byte_stream=response.raw.read(),
                                              file_format='zip',
                                              output_folder=output_folder)

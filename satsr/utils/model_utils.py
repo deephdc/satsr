@@ -4,7 +4,7 @@ import json
 
 import numpy as np
 
-from satsr import paths
+from satsr import paths, main_sat
 from satsr.utils.DSen2Net import s2model
 from satsr.utils.patches import recompose_images, get_test_patches
 
@@ -22,18 +22,24 @@ def super_resolve(data_bands, model, patch_size=128, border=8):
     -------
     Numpy array with the super-resolved image
     """
-    # SCALE = 2000  # FIXME: This seems to be present in testing but not in training --> remove?
+    # Normalize pixel values  and put image in float32 format
+    for res in data_bands.keys():
+        data_bands[res] = data_bands[res].astype(np.float32)
+        data_bands[res] = (data_bands[res] - main_sat.min_val()) / (main_sat.max_val() - main_sat.min_val())
 
+    # Get the patches and predict
     patches = get_test_patches(data_bands=data_bands, patch_size=patch_size, border=border)
-    # patches = {str(res): data/SCALE for res, data in patches.items()}
     patches = {str(res): data for res, data in patches.items()}
-
     prediction = model.predict(patches, verbose=1)
 
+    # Recompose the image from the patches
     min_res = min(data_bands.keys())
     images = recompose_images(prediction, border=border, size=data_bands[min_res].shape)
-    # images *= SCALE
-    # images = np.clip(images, a_min=0, a_max=2**16)
+
+    # Undo the pixel normalization and clip to allowed pixel values
+    images = images * (main_sat.max_val() - main_sat.min_val()) + main_sat.min_val()
+    images = np.clip(images, a_min=main_sat.min_val(), a_max=main_sat.max_val())
+
     return images
 
 

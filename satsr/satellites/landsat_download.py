@@ -119,8 +119,6 @@ class Satellite:
         for r in results:
             tile_id = r['entityId']
             print('Downloading {} ...'.format(tile_id))
-            url = 'https://earthexplorer.usgs.gov/download/12864/{}/STANDARD/EE'.format(tile_id)
-            response = self.session.get(url, stream=True, allow_redirects=True)
 
             save_dir = os.path.join(output_folder, tile_id)
             if not os.path.isdir(save_dir):
@@ -129,6 +127,8 @@ class Satellite:
                 print('File already downloaded')
                 continue
 
+            url = 'https://earthexplorer.usgs.gov/download/12864/{}/STANDARD/EE'.format(tile_id)
+            response = self.session.get(url, stream=True, allow_redirects=True)
             tile_path = misc.open_compressed(byte_stream=response.raw.read(),
                                              file_format='gz',
                                              output_folder=save_dir)

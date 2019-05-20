@@ -24,39 +24,53 @@ from satsr import paths, config, main_sat
 from satsr.utils.DSen2Net import s2model
 from satsr.utils import misc, data_utils, model_utils
 
-# TODO list
-# =========
+# TODO list: HIGH priority
+# ========================
 # TODO: Create a low_RAM version of the code --> ability to create patches for the full image without having to load the
 # full image (do this for both TRAINING and PREDICT)
+# TODO: Fix geotransform and geoprojection for VIIRS and MODIS.
+
+# TODO list: LOW priority
+# ========================
 # TODO: Implement resuming training from weigths
 # TODO: Move to tf.keras --> solve problems with channels_last
-# TODO: Change test to behave like train: If max_res is None it will super-resolve all bands if not only the bands of
-# that resolution
-# TODO: Move pixel_max_value from patches.py to main_sat.py
-# TODO: Define no_data_pixel_value in main_sat.py to use in test function
+# TODO: Try to avoid "ugliness" of having to call variable in main_sat.py as functions (in order to check if sat_name
+# has changed) --> is it even possible to avoid this?
 
 
 def train_fn(TIMESTAMP, CONF):
 
-    # # ############# REMOVE #################################
-    # CONF['general']['satellite'] = 'sentinel2'
-    #
-    # CONF['training']['use_tensorboard'] = True
-    #
-    # CONF['training']['overwrite'] = False
+    ############# REMOVE #################################
+    # CONF['training']['overwrite'] = True
     # CONF['training']['epochs'] = 100
     # CONF['training']['batchsize'] = 64
+    # CONF['training']['use_tensorboard'] = False
+    # CONF['training']['patches_directory'] = '/media/ignacio/Datos/datasets/satelites/patches'
     #
+    # CONF['general']['satellite'] = 'modis'
+    # CONF['training']['max_res'] = 500
+    # CONF['training']['num_patches'] = None #10000
+    # CONF['training']['roi_x_y'] = None #[0, 0, 5000, 5000]  # [2000, 2000, 3000, 3000]
+    # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/modis_tiles/MOD09'
+
+    # CONF['general']['satellite'] = 'viirs'
+    # CONF['training']['max_res'] = 750
+    # CONF['training']['num_patches'] = 10000
+    # CONF['training']['roi_x_y'] = [0, 0, 5000, 5000]  # [2000, 2000, 3000, 3000]
+    # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/viirs_tiles/'
+
+    # CONF['general']['satellite'] = 'sentinel2'
     # CONF['training']['max_res'] = 60
-    # CONF['training']['num_patches'] = 30
-    # CONF['training']['roi_x_y'] = [2000, 2000, 6000, 6000]
-    # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/Sentinel2_tiles/L1C'
-    # #
-    # # # CONF['training']['max_res'] = 30
-    # # # CONF['training']['num_patches'] = 8000
-    # # # CONF['training']['roi_x_y'] = [4000, 4000, 8000, 8000]
-    # # # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/LandSat_tiles'
-    # # ########################################################
+    # CONF['training']['num_patches'] = 10000
+    # CONF['training']['roi_x_y'] = [1000, 1000, 6000, 6000]
+    # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/sentinel2_tiles/L1C'
+
+    # CONF['general']['satellite'] = 'landsat8'
+    # CONF['training']['max_res'] = 30
+    # CONF['training']['num_patches'] = 10000
+    # CONF['training']['roi_x_y'] = [3000, 3000, 8000, 8000]
+    # CONF['training']['tiles_directory'] = '/media/ignacio/Datos/datasets/satelites/landsat8_tiles'
+    ########################################################
 
     if CONF['training']['max_res'] is None:
         CONF['training']['max_res'] = max(main_sat.res_to_bands().keys())
@@ -91,16 +105,19 @@ def train_fn(TIMESTAMP, CONF):
     train_tiles = data_utils.load_data_splits(splits_dir=paths.get_splits_dir(),
                                               split_name='train')
 
-    # ########### REMOVE ##############
-    # train_tiles = train_tiles[:5]
-    # #################################
+    ########### REMOVE ##############
+    # train_tiles = train_tiles[:2]
+    #################################
 
     if CONF['training']['overwrite']:
         # Clear directory from previous patches
         for tile_name in os.listdir(paths.get_patches_dir()):
+            if tile_name == '.gitignore':
+                continue
             tile_path = os.path.join(paths.get_patches_dir(), tile_name)
             shutil.rmtree(tile_path)
 
+        print('Creating train patches ...')
         data_utils.create_patches(tiles=train_tiles,
                                   tiles_dir=CONF['training']['tiles_directory'],
                                   save_dir=paths.get_patches_dir(),
@@ -110,6 +127,7 @@ def train_fn(TIMESTAMP, CONF):
 
     train_gen = data_utils.data_sequence(tiles=train_tiles,
                                          batch_size=CONF['training']['batchsize'],
+                                         # patches_dir=paths.get_patches_dir(),
                                          max_res=max_res)
 
     # Create data generator for the validation set
@@ -117,7 +135,12 @@ def train_fn(TIMESTAMP, CONF):
         val_tiles = data_utils.load_data_splits(splits_dir=paths.get_splits_dir(),
                                                 split_name='val')
 
+        ########### REMOVE ##############
+        # val_tiles = val_tiles[:2]
+        #################################
+
         if CONF['training']['overwrite']:
+            print('Creating validation patches ...')
             data_utils.create_patches(tiles=val_tiles,
                                       tiles_dir=CONF['training']['tiles_directory'],
                                       save_dir=paths.get_patches_dir(),
@@ -127,6 +150,7 @@ def train_fn(TIMESTAMP, CONF):
 
         val_gen = data_utils.data_sequence(tiles=val_tiles,
                                            batch_size=CONF['training']['batchsize'],
+                                           patches_dir=paths.get_patches_dir(),
                                            max_res=max_res)
         val_steps = val_gen.__len__()
 
@@ -153,6 +177,7 @@ def train_fn(TIMESTAMP, CONF):
              'training time (s)': round(time.time() - t0, 2),
              'timestamp': TIMESTAMP}
     stats.update(history.history)
+    stats['lr'] = [float(lr) for lr in stats['lr']]
     stats_dir = paths.get_stats_dir()
     with open(os.path.join(stats_dir, 'stats.json'), 'w') as outfile:
         json.dump(stats, outfile, sort_keys=True, indent=4)

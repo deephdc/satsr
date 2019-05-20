@@ -47,6 +47,11 @@ band_desc = {'B4': 'B4 (665 nm)',
 patch_sizes = {20: 128, 60: 192}
 borders = {20: 8, 60: 12}
 
+# Define pixel values
+max_val = 2**16
+min_val = 1
+fill_val = 0
+
 
 def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=60, select_UTM=''):
     """
@@ -64,7 +69,7 @@ def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=60, select_UTM
     A dict where the keys are int of the resolutions and values are numpy arrays (H, W, N)
     """
 
-    print('Print performing inference with {}'.format(tile_path))
+    print('Loading {}'.format(tile_path))
 
     # Select bands
     resolutions = [res for res in res_to_bands.keys() if res <= max_res]
@@ -176,8 +181,8 @@ def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=60, select_UTM
     for res in ds_bands.keys():
         sys.stdout.write("Selected {}m bands:".format(res))
         for b in range(0, ds_bands[res].RasterCount):
-            desc = gdal_utils.get_short_description(ds_bands[res].GetRasterBand(b + 1).GetDescription())
-            shortname = gdal_utils.get_short_name(desc)
+            desc = get_short_description(ds_bands[res].GetRasterBand(b + 1).GetDescription())
+            shortname = get_short_name(desc)
 
             if shortname in selected_bands:
                 sys.stdout.write(" " + shortname)
@@ -212,3 +217,28 @@ def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=60, select_UTM
              'geoprojection': ds_bands[10].GetProjection()}
 
     return data_bands, coord
+
+
+def get_short_description(description, output_file_format='GTiff'):
+    """
+    Get a short band description from full description
+    """
+    m = re.match("(.*?), central wavelength (\d+) nm", description)
+    if m:
+        return m.group(1) + " (" + m.group(2) + " nm)"
+    # Some HDR restrictions... ENVI band names should not include commas
+    if output_file_format == 'ENVI' and ',' in description:
+        pos = description.find(',')
+        return description[:pos] + description[(pos + 1):]
+    return description
+
+
+def get_short_name(description):
+    """
+    Get short band name from full description
+    """
+    if ',' in description:
+        return description[:description.find(',')]
+    if ' ' in description:
+        return description[:description.find(' ')]
+    return description[:3]
