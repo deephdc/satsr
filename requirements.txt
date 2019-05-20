@@ -11,3 +11,4 @@ Flask>=1.0.2
 requests>=2.18.4
 PyYAML>=3.12
 Keras>=2.2
+tqdm>=4.31.1
