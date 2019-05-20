@@ -1,7 +1,7 @@
 DEEP Open Catalogue: satsr
-==========================
+=================
 
-[![Build Status](https://jenkins.indigo-datacloud.eu:8080/buildStatus/icon?job=Pipeline-as-code/DEEP-OC-org/satsr/master)](https://jenkins.indigo-datacloud.eu:8080/job/Pipeline-as-code/job/DEEP-OC-org/job/satsr/job/master/)
+[![Build Status](https://jenkins.indigo-datacloud.eu/buildStatus/icon?job=Pipeline-as-code/DEEP-OC-org/satsr/master)](https://jenkins.indigo-datacloud.eu/job/Pipeline-as-code/job/DEEP-OC-org/job/satsr/job/master/)
 
 **Author/Mantainer:** [Ignacio Heredia](https://github.com/IgnacioHeredia) (CSIC)
 
@@ -14,8 +14,10 @@ Right now we are supporting super-resolution for the following satellites:
 
 * [Sentinel 2](https://sentinel.esa.int/web/sentinel/missions/sentinel-2) 
 * [Landsat 8](https://landsat.gsfc.nasa.gov/landsat-8/)
+* [VIIRS](https://ncc.nesdis.noaa.gov/VIIRS/)
+* [MODIS](https://terra.nasa.gov/about/terra-instruments/modis)
 
- Some demo images of the super-resolutions performed in non-training data can be found [here](./reports/figures). 
+More information on the satellites and processing levels that are supported can be found [here](./reports/additional_notes.md) along with some [demo images](./reports/figures) of the super-resolutions performed in non-training data. 
 If you want to perform super-resolution on another satellite, go to the [training section](#train-other-satellites) to see how you can easily add support for additional satellites. We are happy to accept PRs! :rocket:
 
 You can find more information about it in the [DEEP Marketplace](https://marketplace.deep-hybrid-datacloud.eu/).
@@ -77,24 +79,24 @@ Now open http://0.0.0.0:5000/ and look for the methods belonging to the `satsr` 
 
 If you have images from a satellite that is not currently supported you can easily add support for your satellite:
 
-*  Go to `./satsr/satellites` and create a `mynewsat.py` file. This file should contains basic information like resolutions, bands names and functions for opening the bands. Check the `main_sat.py` for a reference on what parameters and functions have to be defined.
-* *Optional:* You can also create another file like  `mynewsat_download.py` to support downloading data directly with Python.
+*  Go to `./satsr/satellites` and create a `mynewsat.py` file. This file should contains basic information like resolutions, bands names and functions for opening the bands. Check the `./satsr/main_sat.py` for a reference on what parameters and functions have to be defined.
+* *Optional:* You can also create another file like  `mynewsat_download.py` to support downloading data directly with Python (see `./satsr/data_download.py`).
 * Link you newly created files with the satellite names by modifying the file `./satsr/main_sat.py`.
-* Download training data (you can use the file `data_download.py` for convenience).
+* Download training data (you can use the file `./satsr/data_download.py` for convenience).
 * Create in `./data/dataset_files` a `train.txt` file with the tile names of the folders you want to train with. You can also create a `val.txt` if you want to use validation during training.
 * Run the `TRAIN` method in the DEEPaaS API with your training configuration. You can monitor the progress of the training using [Tensorboard](https://github.com/tensorflow/tensorboard) by going to http://0.0.0.0:6006/ . 
 * Rename the output timestamped folder in `./models` to something like `mynewsat_model_*m`.
 
-Now you proceed to the next section to use you newly trained model to perfom super-resolution. If you are happy with the performance of your model we accept PRs to add it to the catalogue! In the near future we'll be happy to add support for additional Lansat and Sentinel missions, as well as any other satellite imagery in the public domain like [MODIS](https://terra.nasa.gov/about/terra-instruments/modis), [VIIRS](https://ncc.nesdis.noaa.gov/VIIRS/), [ASTER](https://terra.nasa.gov/about/terra-instruments/aster) or [MeteoSat](https://www.eumetsat.int/website/home/Satellites/CurrentSatellites/Meteosat/index.html).
+Now you proceed to the next section to use you newly trained model to perfom super-resolution. If you are happy with the performance of your model we accept PRs to add it to the catalogue! In the near future we'll be happy to add support for additional Lansat and Sentinel missions, along with additional processing levels for satellites that are already supported, as well as any other satellite imagery in the public domain like [ASTER](https://terra.nasa.gov/about/terra-instruments/aster) or [MeteoSat](https://www.eumetsat.int/website/home/Satellites/CurrentSatellites/Meteosat/index.html).
 
 
-## Perform superresolution
+## Perform super-resolution
 
 There are two possible ways to use the `PREDICT` method from the DEEPaaS API:
 
 * supply to the `data` argument a path  pointing to a compressed file (`zip` or tarball) containing your satellite tile.
 * supply to the `url` argument an online url  of a compressed file (`zip` or tarball) containing your satellite tile.
-Here is an [example](https://cephrgw01.ifca.es:8080/swift/v1/demo-test-Sentinel2-tile/S2A_MSIL1C_20170608T105651_N0205_R094_T30TWM_20170608T110453.SAFE.zip) of such an url for the Sentinel-2 that you can use for testing purposes.
+Here is an [example](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip) of such an url for the Sentinel-2 L2A that you can use for testing purposes. You can find other sample url for other satellites [here](./reports/additional_notes.md).
 
 
 ## Acknowledgments
