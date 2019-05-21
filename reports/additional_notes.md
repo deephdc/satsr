@@ -1,6 +1,6 @@
 # Additional notes
 
-This file gathers addiotnal information on several topics.
+This file gathers additional information on several topics.
 
 **Table of Contents**
 
