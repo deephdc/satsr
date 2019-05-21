@@ -15,7 +15,7 @@ This file gathers additional information on several topics.
 
 ## Satellites
 
-If you want to have a brief overview of the different data of the satellite we recommend the [CREODIAS](https://discovery.creodias.eu/dataset) online viewer.
+If you want to have a brief overview of the data of the different satellites we recommend the [CREODIAS](https://discovery.creodias.eu/dataset) online viewer.
 
 
 ### Sentinel 2
@@ -28,6 +28,8 @@ In the case of Sentinel 2, we upsample 60m and 20m resolution bands to 10m resol
 |     20m     | 'B5', 'B6', 'B7', 'B8A', 'B11', 'B12' |
 |     60m     | 'B1', 'B9'                            |
 
+**Available processing levels for super-resolution**
+
 * Level 1C:
 [Sample - Level 1C](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL1C_20170608T105651_N0205_R094_T30TWM_20170608T110453.SAFE.zip
 )
@@ -36,7 +38,6 @@ In the case of Sentinel 2, we upsample 60m and 20m resolution bands to 10m resol
 [Sample - Level 2A](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip)
 
 **References**
-
 
 * [Download the data](https://scihub.copernicus.eu/dhus/#/home)
 
@@ -72,7 +73,9 @@ landsat8_tiles/
     ├── LC08_L1TP_048024_20190123_20190205_01_T1_ANG.txt
     ├── LC08_L1TP_048024_20190123_20190205_01_T1_B10.TIF
     ├── ...
+
 ```
+**Available processing levels for super-resolution**
 
 * Level 1C:
 [Sample - Level 1C](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/LC82150652019025LGN00.zip)
@@ -90,6 +93,8 @@ In the case of VIIRS we upsample the 750m resolution bands to 350m resolution.
 |:-----------:|--------------------------------------------------------|
 |     375m    | 'I1', 'I2', 'I3'                                       |
 |     750m    | 'M1', 'M2', 'M3', 'M4', 'M5', 'M7', 'M8', 'M10', 'M11' |
+
+**Available processing levels for super-resolution**
 
 * Level 2 - VNP09 Dataset:
 [Sample - VNP09](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/VNP09.A2019021.2142.001.2019035204543.zip)
@@ -115,6 +120,8 @@ Thefore in the case of MODIS we upsample the 500m and 1km resolution bands to 25
 |     250m    | '250_B1', '250_B2'                                                                                                                                                                                             |
 |     500m    | '500_B1', '500_B2', '500_B3', '500_B4', '500_B5', '500_B6', '500_B7'                                                                                                                                           |
 |    1000m    | '1000_B1', '1000_B2', '1000_B3', '1000_B4', '1000_B5', '1000_B6', '1000_B7', '1000_B8', '1000_B9', '1000_B10', '1000_B11', '1000_B12', '1000_B13', '1000_B14', '1000_B15', '1000_B16', '1000_B26', '1000_B3PR' |
+
+**Available processing levels for super-resolution**
 
 * Level 2 - MOD09 Dataset:
 [Sample - MOD09](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/MOD09.A2019021.1710.006.2019023051303.zip)
