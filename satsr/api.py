@@ -123,13 +123,17 @@ def predict_data(args):
     """
     Perform super-resolution on a satellite tile
     """
+    #####FIXME: Remove after DEEPaaS upgrade
+    if type(args['files']) is not list:
+        args['files'] = [args['files']]
+    ########################################
+
     update_user_conf(user_args=args)
     conf = config.conf_dict['testing']
 
     # Process data stream of bytes
-    filenames = [args.pop('files')]
-    file_format = mimetypes.guess_extension(filenames[0].content_type)[1:]
-    tile_path = misc.open_compressed(byte_stream=filenames[0].read(),
+    file_format = mimetypes.guess_extension(args['files'][0].content_type)[1:]
+    tile_path = misc.open_compressed(byte_stream=args['files'][0].read(),
                                      file_format=file_format,
                                      output_folder=os.path.join(paths.get_test_dir(), 'sat_tiles'))
 
