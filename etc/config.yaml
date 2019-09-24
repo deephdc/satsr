@@ -22,7 +22,7 @@ general:
     choices: ["sentinel2", "landsat8", "viirs", "modis"]
     help: >
           Name of the satellite you want to use. Satellite options, as well as instructions on how to add additional
-          satellites, are defined in /satsr/main_sat.py.
+          satellites, are defined in `/satsr/main_sat.py`.
 
 
 #####################################################
@@ -35,9 +35,9 @@ training:
     value:
     type: "str"
     help: >
-          Base directory for the satellite's tiles. Relative paths of the tiles defined in [train.txt/val.txt] are
+          Base directory for the satellite's tiles. Relative paths of the tiles defined in [`train.txt|val.txt`] are
           defined with respect to this path.
-          If set to `None`, the default will be "./satsr/data/tiles".
+          If set to `None`, the default will be `./satsr/data/tiles`.
 
   patches_directory:
     value:
@@ -46,7 +46,7 @@ training:
           Base directory to save the satellite's tiles' patches. If the training involves a considerable amount of data,
           the user might consider pointing this path to a folder in an external drive, as patches can easily build to
           100's of GB.
-          If set to `None`, the default will be "./satsr/data/patches".
+          If set to `None`, the default will be `./satsr/data/patches`.
 
   epochs:
     value: 30

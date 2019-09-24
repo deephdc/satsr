@@ -123,11 +123,6 @@ def predict_data(args):
     """
     Perform super-resolution on a satellite tile
     """
-    #####FIXME: Remove after DEEPaaS upgrade
-    if type(args['files']) is not list:
-        args['files'] = [args['files']]
-    ########################################
-
     update_user_conf(user_args=args)
     conf = config.conf_dict['testing']
 
@@ -176,15 +171,22 @@ def get_args(default_conf):
             choices = g_val['choices'] if ('choices' in gg_keys) else None
 
             # Additional info in help string
-            help += '\n' + "Group name: **{}**".format(str(group))
-            if choices: help += '\n' + "Choices: {}".format(str(choices))
-            if type: help += '\n' + "Type: {}".format(g_val['type'])
+            help += '\n' + "<font color='#C5576B'> Group name: **{}**".format(str(group))
+            if choices:
+                help += '\n' + "Choices: {}".format(str(choices))
+            if type:
+                help += '\n' + "Type: {}".format(g_val['type'])
+            help += "</font>"
 
+            # Create arg dict
             opt_args = {'default': json.dumps(g_val['value']),
                         'help': help,
                         'required': False}
-            # if type: opt_args['type'] = type # this breaks the submission because the json-dumping
-            #                                     => I'll type-check args inside the test_fn
+            if choices:
+                opt_args['choices'] = [json.dumps(i) for i in choices]
+            # if type:
+            #     opt_args['type'] = type # this breaks the submission because the json-dumping
+            #                               => I'll type-check args inside the test_fn
 
             args[g_key] = opt_args
     return args
