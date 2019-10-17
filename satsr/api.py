@@ -115,7 +115,8 @@ def predict_url(args):
     # Stream the file back
     return flask.send_file(filename_or_fp=output_path,
                            as_attachment=True,
-                           attachment_filename=os.path.basename(output_path))
+                           attachment_filename=os.path.basename(output_path),
+                           cache_timeout=60)
 
 
 @catch_error
@@ -144,7 +145,8 @@ def predict_data(args):
     # Stream the file back
     return flask.send_file(filename_or_fp=output_path,
                            as_attachment=True,
-                           attachment_filename=os.path.basename(output_path))
+                           attachment_filename=os.path.basename(output_path),
+                           cache_timeout=60)
 
 
 @catch_error

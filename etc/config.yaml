@@ -130,7 +130,7 @@ training:
 testing:
 
   roi_x_y_test:
-    value: [0,0,1000,1000]
+    value: [2000,2000,2500,2500]
     type: "list"
     help: >
           Sets the region of interest to extract as pixels locations on the 10m bands.
@@ -143,7 +143,7 @@ testing:
 
           **ATTENTION**
 
-          * We set the default region to [0,0,1000,1000] as many computers do not have the RAM to store in memory
+          * We set the default region to [2000,2000,2500,2500] as many computers do not have the RAM to store in memory
           a complete image.
 
           * Each side must have a minimal size of 192.

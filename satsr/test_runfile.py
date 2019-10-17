@@ -76,7 +76,7 @@ def test(tile_path, max_res=None, output_path=None, roi_x_y=None, roi_lon_lat=No
 
     # Check image
     if not np.any(data_bands[min_res]):
-        raise Exception('Empty image')
+        raise Exception('The selected region is empty.')
 
     # Compute mask of fill_values and set fill_values--> min_values for processing
     mask = {}
