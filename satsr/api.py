@@ -26,6 +26,7 @@ from satsr.utils import misc
 
 
 # FIXME: There is a memory leak from using flask.send_file to return the prediction.
+# --> fixed with cache_timeout flag?
 # Flask.send_files stores the response in cache/buffer that means I am losing 100MB of RAM memory (which is the size
 # of an typical output with the default parameters) at each iteration (at each POST request for the predict method).
 # This bug is NOT fixed by using send_files with BytesIO or using send_from_directory (instead of send_file)
@@ -87,7 +88,7 @@ def predict_url(args):
     Perform super-resolution on a satellite tile hosted on the web
     """
     update_user_conf(user_args=args)
-    conf = config.conf_dict
+    conf = config.conf_dict['testing']
 
     # Use a compressed file hosted on the web
     url = args['urls'][0]
@@ -105,12 +106,12 @@ def predict_url(args):
 
     # Predict and save the output
     output_path = test(tile_path=tile_path,
-                       output_path=conf['testing']['output_path'],
-                       roi_x_y=conf['testing']['roi_x_y'],
-                       roi_lon_lat=conf['testing']['roi_lon_lat'],
-                       max_res=conf['testing']['max_res'],
-                       copy_original_bands=conf['testing']['copy_original_bands'],
-                       output_file_format=conf['testing']['output_file_format'])
+                       output_path=conf['output_path'],
+                       roi_x_y=conf['roi_x_y_test'],
+                       roi_lon_lat=conf['roi_lon_lat_test'],
+                       max_res=conf['max_res_test'],
+                       copy_original_bands=conf['copy_original_bands'],
+                       output_file_format=conf['output_file_format'])
 
     # Stream the file back
     return flask.send_file(filename_or_fp=output_path,

@@ -29,6 +29,13 @@ from satsr.utils import misc, data_utils, model_utils
 # TODO: Create a low_RAM version of the code --> ability to create patches for the full image without having to load the
 # full image (do this for both TRAINING and PREDICT)
 # TODO: Fix geotransform and geoprojection for VIIRS and MODIS.
+# TODO: Install manually GDAL in the Docker container to allow Sentinel 2 L2A
+# The Tensorflow 1.12 image is using Ubuntu 16.04 which has a default GDAL version of 2.2 [1].
+# The solution might be to:
+# * install GDAL manually (difficult because it has a lot of dependencies)
+# * wait for Tensorflow images to use 18.04 (unlikely because Tensorflow keeps evolving and they will not update old images)
+# * use a Tensorflow image > 1.12 that uses Ubuntu 18.04 (but have to check that nothing else breaks)
+# * install GDAL with conda (not likely because Tensorflow base image are made to work without Anaconda)
 
 # TODO list: LOW priority
 # ========================

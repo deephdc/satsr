@@ -1,4 +1,5 @@
 # external requirements
+# bigger Keras version gives errors (we should move to tf.keras)
 Sphinx
 python-dotenv>=0.5.1
 numpy>=1.14
@@ -10,5 +11,5 @@ Werkzeug>=0.14.1
 Flask>=1.0.2
 requests>=2.18.4
 PyYAML>=3.12
-Keras>=2.2
+Keras==2.2.4
 tqdm>=4.31.1

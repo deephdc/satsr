@@ -12,6 +12,7 @@ from collections import defaultdict
 import os
 import re
 import sys
+import pkg_resources
 
 import numpy as np
 from osgeo import gdal
@@ -90,6 +91,11 @@ def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=60, select_UTM
         xml_path = os.path.join(tile_path, matches[0])
     else:
         raise ValueError('No .xml file found.')
+
+    # Give a clear error message when Sentinel 2 L2A not working due to old GDAL version
+    gdal_ver = pkg_resources.get_distribution("GDAL").version
+    if os.path.basename(xml_path) == 'MTD_MSIL2A.xml' and gdal_ver < '2.4.0':
+        raise Exception('Sentinel2 L2A is temporarily not supported due to version conflicts in the base Docker image')
 
     # Open XML file and read band descriptions
     if not os.path.isfile(xml_path):
