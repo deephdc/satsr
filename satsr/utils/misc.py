@@ -96,7 +96,7 @@ def open_compressed(byte_stream, file_format, output_folder):
 
     Parameters
     ----------
-    byte_stream : bytes
+    byte_stream : BinaryIO
     file_format : str
         Compatible file formats: tarballs, zip files
     output_folder : str
@@ -109,13 +109,13 @@ def open_compressed(byte_stream, file_format, output_folder):
 
     tar_extensions = ['tar', 'bz2', 'tb2', 'tbz', 'tbz2', 'gz', 'tgz', 'lz', 'lzma', 'tlz', 'xz', 'txz', 'Z', 'tZ']
     if file_format in tar_extensions:
-        tar = tarfile.open(mode="r:{}".format(file_format), fileobj=io.BytesIO(byte_stream))
+        tar = tarfile.open(mode="r:{}".format(file_format), fileobj=byte_stream)
         tar.extractall(output_folder)
         folder_name = tar.getnames()[0]
         return os.path.join(output_folder, folder_name)
 
     elif file_format == 'zip':
-        zf = zipfile.ZipFile(io.BytesIO(byte_stream))
+        zf = zipfile.ZipFile(byte_stream)
         zf.extractall(output_folder)
         folder_name = zf.namelist()[0].split('/')[0]
         return os.path.join(output_folder, folder_name)
