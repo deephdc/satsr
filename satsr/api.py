@@ -7,6 +7,7 @@ Email: iheredia@ifca.unican.es
 Github: ignacioheredia
 """
 
+import io
 import os
 import pkg_resources
 import json
@@ -14,24 +15,19 @@ import builtins
 import mimetypes
 from collections import OrderedDict
 from datetime import datetime
+import shutil
 
-import flask
 import requests
-from werkzeug.exceptions import BadRequest
+from webargs import fields, validate
+from aiohttp.web import HTTPBadRequest
 
 from satsr import config, paths, main_sat
 from satsr.train_runfile import train_fn
-from satsr.test_runfile import test
+from satsr.test_runfile import test, load_models
 from satsr.utils import misc
 
 
-# FIXME: There is a memory leak from using flask.send_file to return the prediction.
-# --> fixed with cache_timeout flag?
-# Flask.send_files stores the response in cache/buffer that means I am losing 100MB of RAM memory (which is the size
-# of an typical output with the default parameters) at each iteration (at each POST request for the predict method).
-# This bug is NOT fixed by using send_files with BytesIO or using send_from_directory (instead of send_file)
-# This bug IS probably fixed by sending to the user an url to download the file instead of the file itself.
-# Maybe the file has to be saved in the static folder from flask?
+# FIXME: There is a memory leak? --> outputs should be periodically cleared
 
 
 def catch_error(f):
@@ -39,7 +35,7 @@ def catch_error(f):
         try:
             return f(*args, **kwargs)
         except Exception as e:
-            raise BadRequest(e)
+            raise HTTPBadRequest(reason=e)
     return wrap
 
 
@@ -59,8 +55,11 @@ def update_user_conf(user_args):
     config.conf_dict = config.get_conf_dict(conf=CONF)
 
 
-@catch_error
-def train(args):
+def warm():
+    load_models()
+
+
+def train(**args):
     """
     Train a super-resolution model
     """
@@ -83,6 +82,20 @@ def train(args):
 
 
 @catch_error
+def predict(**args):
+
+    if (not any([args['urls'], args['files']]) or
+            all([args['urls'], args['files']])):
+        raise Exception("You must provide either 'url' or 'data' in the payload")
+
+    if args['files']:
+        args['files'] = [args['files']]  # patch until list is available
+        return predict_data(args)
+    elif args['urls']:
+        args['urls'] = [args['urls']]  # patch until list is available
+        return predict_url(args)
+
+
 def predict_url(args):
     """
     Perform super-resolution on a satellite tile hosted on the web
@@ -94,33 +107,31 @@ def predict_url(args):
     url = args['urls'][0]
     resp = requests.get(url, stream=True, allow_redirects=True)
 
-    file_format = mimetypes.guess_extension(resp.headers['content-type'])
+    file_format = mimetypes.guess_extension(resp.headers['content-type'])[1:]
     if file_format is None:
         file_format = os.path.splitext(resp.headers['X-Object-Meta-Orig-Filename'])[1][1:]
 
     # Download and extract the compressed file
     print('Downloading the file ...')
-    tile_path = misc.open_compressed(byte_stream=resp.raw.read(),
+    tile_path = misc.open_compressed(byte_stream=io.BytesIO(resp.raw.read()),
                                      file_format=file_format,
                                      output_folder=os.path.join(paths.get_test_dir(), 'sat_tiles'))
 
     # Predict and save the output
-    output_path = test(tile_path=tile_path,
-                       output_path=conf['output_path'],
-                       roi_x_y=conf['roi_x_y_test'],
-                       roi_lon_lat=conf['roi_lon_lat_test'],
-                       max_res=conf['max_res_test'],
-                       copy_original_bands=conf['copy_original_bands'],
-                       output_file_format=conf['output_file_format'])
+    try:
+        output_path = test(tile_path=tile_path,
+                           output_path=conf['output_path'],
+                           roi_x_y=conf['roi_x_y_test'],
+                           roi_lon_lat=conf['roi_lon_lat_test'],
+                           max_res=conf['max_res_test'],
+                           copy_original_bands=conf['copy_original_bands'],
+                           output_file_format=conf['output_file_format'])
+    finally:
+        shutil.rmtree(tile_path, ignore_errors=True)
 
-    # Stream the file back
-    return flask.send_file(filename_or_fp=output_path,
-                           as_attachment=True,
-                           attachment_filename=os.path.basename(output_path),
-                           cache_timeout=60)
+    return open(output_path, 'rb')
 
 
-@catch_error
 def predict_data(args):
     """
     Perform super-resolution on a satellite tile
@@ -130,40 +141,29 @@ def predict_data(args):
 
     # Process data stream of bytes
     file_format = mimetypes.guess_extension(args['files'][0].content_type)[1:]
-    tile_path = misc.open_compressed(byte_stream=args['files'][0].read(),
+    tile_path = misc.open_compressed(byte_stream=open(args['files'][0].filename, 'rb'),
                                      file_format=file_format,
                                      output_folder=os.path.join(paths.get_test_dir(), 'sat_tiles'))
 
     # Predict and save the output
-    output_path = test(tile_path=tile_path,
-                       output_path=conf['output_path'],
-                       roi_x_y=conf['roi_x_y_test'],
-                       roi_lon_lat=conf['roi_lon_lat_test'],
-                       max_res=conf['max_res_test'],
-                       copy_original_bands=conf['copy_original_bands'],
-                       output_file_format=conf['output_file_format'])
+    try:
+        output_path = test(tile_path=tile_path,
+                           output_path=conf['output_path'],
+                           roi_x_y=conf['roi_x_y_test'],
+                           roi_lon_lat=conf['roi_lon_lat_test'],
+                           max_res=conf['max_res_test'],
+                           copy_original_bands=conf['copy_original_bands'],
+                           output_file_format=conf['output_file_format'])
+    finally:
+        shutil.rmtree(tile_path, ignore_errors=True)
 
-    # Stream the file back
-    return flask.send_file(filename_or_fp=output_path,
-                           as_attachment=True,
-                           attachment_filename=os.path.basename(output_path),
-                           cache_timeout=60)
+    return open(output_path, 'rb')
 
 
-@catch_error
-def get_args(default_conf):
+def populate_parser(parser, default_conf):
     """
-    Returns a dict of dicts with the following structure to feed the deepaas API parser:
-    { 'arg1' : {'default': '1',     #value must be a string (use json.dumps to convert Python objects)
-                'help': '',         #can be an empty string
-                'required': False   #bool
-                },
-      'arg2' : {...
-                },
-    ...
-    }
+    Fill a parser with arguments
     """
-    args = OrderedDict()
     for group, val in default_conf.items():
         for g_key, g_val in val.items():
             gg_keys = g_val.keys()
@@ -182,38 +182,52 @@ def get_args(default_conf):
             help += "</font>"
 
             # Create arg dict
-            opt_args = {'default': json.dumps(g_val['value']),
-                        'help': help,
-                        'required': False}
+            opt_args = {'missing': json.dumps(g_val['value']),
+                        'description': help,
+                        'required': False,
+                        }
             if choices:
-                opt_args['choices'] = [json.dumps(i) for i in choices]
-            # if type:
-            #     opt_args['type'] = type # this breaks the submission because the json-dumping
-            #                               => I'll type-check args inside the test_fn
+                opt_args['enum'] = [json.dumps(i) for i in choices]
 
-            args[g_key] = opt_args
-    return args
+            parser[g_key] = fields.Str(**opt_args)
+
+    return parser
 
 
-@catch_error
 def get_train_args():
-
+    parser = OrderedDict()
     default_conf = config.CONF
     default_conf = OrderedDict([('general', default_conf['general']),
                                 ('training', default_conf['training'])])
-    return get_args(default_conf)
+    return populate_parser(parser, default_conf)
 
 
-@catch_error
-def get_test_args():
-
+def get_predict_args():
+    parser = OrderedDict()
     default_conf = config.CONF
     default_conf = OrderedDict([('general', default_conf['general']),
                                 ('testing', default_conf['testing'])])
-    return get_args(default_conf)
+
+    # Add data and url fields
+    parser['files'] = fields.Field(required=False,
+                                   missing=None,
+                                   type="file",
+                                   data_key="data",
+                                   location="form",
+                                   description="Select the audio file you want to classify.")
+
+    parser['urls'] = fields.Url(required=False,
+                                missing=None,
+                                description="Select an URL of the audio file you want to classify.")
+    # missing action="append" --> append more than one url
+
+    # Add format type of the response
+    parser['accept'] = fields.Str(description="Media type(s) that is/are acceptable for the response.",
+                                  validate=validate.OneOf(["image/tiff"]))
+
+    return populate_parser(parser, default_conf)
 
 
-@catch_error
 def get_metadata():
     """
     Function to read metadata

@@ -7,9 +7,11 @@ scikit-image>=0.13
 imageio>=2.3
 matplotlib>=3.0
 GDAL>=2.2
-Werkzeug>=0.14.1
 Flask>=1.0.2
 requests>=2.18.4
 PyYAML>=3.12
 Keras==2.2.4
 tqdm>=4.31.1
+webargs>=5.5.2
+aiohttp>=3.6.2
+deepaas>=1.0.0
