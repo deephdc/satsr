@@ -1,6 +1,6 @@
 #!/usr/bin/groovy
 
-@Library(['github.com/indigo-dc/jenkins-pipeline-library']) _
+@Library(['github.com/indigo-dc/jenkins-pipeline-library@1.2.3']) _
 
 def job_result_url = ''
 
@@ -13,7 +13,7 @@ pipeline {
         author_name = "Ignacio Heredia (CSIC)"
         author_email = "iheredia@ifca.unican.es"
         app_name = "satsr"
-        job_location = "Pipeline-as-code/DEEP-OC-org/DEEP-OC-satsr/master"
+        job_location = "Pipeline-as-code/DEEP-OC-org/DEEP-OC-satsr/${env.BRANCH_NAME}"
     }
 
     stages {
