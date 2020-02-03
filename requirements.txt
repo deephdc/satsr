@@ -14,4 +14,4 @@ Keras==2.2.4
 tqdm>=4.31.1
 webargs>=5.5.2
 aiohttp>=3.6.2
-deepaas
+deepaas>=1.0.0
