@@ -6,7 +6,6 @@ numpy>=1.14
 scikit-image>=0.13
 imageio>=2.3
 matplotlib>=3.0
-GDAL>=2.2
 Flask>=1.0.2
 requests>=2.18.4
 PyYAML>=3.12
