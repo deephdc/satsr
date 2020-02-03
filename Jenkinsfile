@@ -1,12 +1,12 @@
 #!/usr/bin/groovy
 
-@Library(['github.com/indigo-dc/jenkins-pipeline-library@1.2.3']) _
+@Library(['github.com/indigo-dc/jenkins-pipeline-library@release/1.4.0']) _
 
 def job_result_url = ''
 
 pipeline {
     agent {
-        label 'python'
+        label 'python3.6'
     }
 
     environment {
@@ -23,21 +23,13 @@ pipeline {
             }
         }
 
-        stage('Style analysis: PEP8') {
+        stage('Style analysis') {
             steps {
                 ToxEnvRun('pep8')
             }
             post {
                 always {
-                    warnings canComputeNew: false,
-                             canResolveRelativePaths: false,
-                             defaultEncoding: '',
-                             excludePattern: '',
-                             healthy: '',
-                             includePattern: '',
-                             messagesPattern: '',
-                             parserConfigurations: [[parserName: 'PYLint', pattern: '**/flake8.log']],
-                             unHealthy: ''
+                    WarningsReport('Pep8')
                 }
             }
         }
