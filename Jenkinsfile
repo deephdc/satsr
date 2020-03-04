@@ -23,7 +23,7 @@ pipeline {
             }
         }
 
-// Do not perform style analysis because it will fail due to the GDAL package
+// Do not perform style analysis nor security scanner because it will fail due to the GDAL package
 // (one needs to install certain Linux packages before being able to properly
 // install GDAL)
 // The Exception will be the following:
@@ -41,21 +41,21 @@ pipeline {
 //             }
 //         }
 
-        stage('Security scanner') {
-            steps {
-                ToxEnvRun('bandit-report')
-                script {
-                    if (currentBuild.result == 'FAILURE') {
-                        currentBuild.result = 'UNSTABLE'
-                    }
-               }
-            }
-            post {
-               always {
-                    HTMLReport("/tmp/bandit", 'index.html', 'Bandit report')
-                }
-            }
-        }
+//         stage('Security scanner') {
+//             steps {
+//                 ToxEnvRun('bandit-report')
+//                 script {
+//                     if (currentBuild.result == 'FAILURE') {
+//                         currentBuild.result = 'UNSTABLE'
+//                     }
+//                }
+//             }
+//             post {
+//                always {
+//                     HTMLReport("/tmp/bandit", 'index.html', 'Bandit report')
+//                 }
+//             }
+//         }
 
         stage("Re-build Docker image") {
             when {
