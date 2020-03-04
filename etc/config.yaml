@@ -134,8 +134,9 @@ testing:
     type: "list"
     help: >
           Sets the region of interest to extract as pixels locations on the 10m bands.
-          Use this syntax: `[x_1,y_1,x_2,y_2]`. The order of points 1 and 2 does not matter.
-          If set to `None` (and `roi_lon_lat` also `None`), the whole image will be superresolved.
+          Use this syntax: `[x_1,y_1,x_2,y_2]`.
+          The order of points 1 and 2 does not matter: the region of interest extends to the min/max in each direction.
+          If set to `None` (and `roi_lon_lat_test` also `None`), the whole image will be superresolved.
 
           Example:
           `[0,0,1000,1000]`
@@ -152,9 +153,13 @@ testing:
     value:
     type: "list"
     help: >
-          Sets the region of interest in coordinates.
-          Use this syntax: `[x_1,y_1,x_2,y_2]`. The order of points 1 and 2 does not matter.
-          If set to `None` (and `roi_x_y` also `None`), the whole image will be superresolved.
+          Sets the region of interest in coordinates in WGS84, decimal notation
+          Use this syntax: `[x_1,y_1,x_2,y_2]`.
+          The order of points 1 and 2 does not matter: the region of interest extends to the min/max in each direction.
+          If set to `None` (and `roi_x_y_test` also `None`), the whole image will be superresolved.
+
+          Example:
+          `[-1.12132,44.72408,-0.90350,44.58646]`
 
   max_res_test:
     value:

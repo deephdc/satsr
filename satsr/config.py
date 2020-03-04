@@ -25,6 +25,14 @@ def check_conf(conf=CONF):
     Checks for configuration parameters
     """
     all_keys = set()
+
+    # Check roi_x_y and roi_lon_lat are not defined at the same time
+    if 'testing' in conf.keys():
+        if conf['testing']['roi_x_y_test']['value'] and conf['testing']['roi_lon_lat_test']['value']:
+            raise Exception('You must use either `roi_x_y_test` or `roi_lon_lat_test`. '
+                            'If you are seeing this message you probably tried to use a region of interest with '
+                            'coordinates but forgot to set the default value of `roi_x_y_test` to `None`.')
+
     for group, val in sorted(conf.items()):
         for g_key, g_val in sorted(val.items()):
             gg_keys = g_val.keys()
@@ -90,7 +98,7 @@ def print_full_conf(conf=CONF):
                 print(body)
             print('\n')
 
-            
+
 def print_conf_table(conf=conf_dict):
     """
     Print configuration parameters in a table
