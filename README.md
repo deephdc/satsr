@@ -24,7 +24,15 @@ performed in non-training data.
 If you want to perform super-resolution on another satellite, go to the [training section](#train-other-satellites) to
 see how you can easily add support for additional satellites. We are happy to accept PRs! :rocket:
 
-You can find more information about it in the [DEEP Marketplace](https://marketplace.deep-hybrid-datacloud.eu/modules/upscale-multispectral-satellites-images.html).
+You can find more information about it in the [DEEP Marketplace](https://marketplace.deep-hybrid-datacloud.eu/modules/deep-oc-satsr.html).
+
+**Table of contents**
+1. [Installing this module](#installing-this-module)
+    1. [Local installation](#local-installation)
+    2. [Docker installation](#docker-installation)
+2. [Train other satellites](#train-other-satellites)
+3. [Perform super-resolution](#perform-super-resolution)
+4. [Acknowledgements](#acknowledgments)
 
 ![demo_superres](./reports/figures/demo.png)
 
@@ -134,13 +142,10 @@ The main changes with respect to the original repo are that:
 * it has been made compatible with the [DEEPaaS API](http://docs.deep-hybrid-datacloud.eu/en/latest/user/overview/api.html).
 * some minor bugs have been corrected (and contributed back into the original repo in [#5](https://github.com/lanha/DSen2/pull/5) and [#6](https://github.com/lanha/DSen2/issues/6)).
 
-If you consider this project to be useful, please consider citing the [original paper](https://arxiv.org/abs/1803.04271):
+If you consider this project to be useful, please consider citing the DEEP Hybrid DataCloud project:
 
-```
-@article{lanaras2018super,
-  title={Super-Resolution of Sentinel-2 Images: Learning a Globally Applicable Deep Neural Network},
-  author={Lanaras, Charis and Bioucas-Dias, Jos{\'e} and Galliani, Silvano and Baltsavias, Emmanuel and Schindler, Konrad},
-  journal={arXiv preprint arXiv:1803.04271},
-  year={2018}
-}
-```
+> García, Álvaro López, et al. [A Cloud-Based Framework for Machine Learning Workloads and Applications.](https://ieeexplore.ieee.org/abstract/document/8950411/authors) IEEE Access 8 (2020): 18681-18692. 
+
+along with the original paper:
+
+> Lanaras, C., Bioucas-Dias, J., Galliani, S., Baltsavias, E., & Schindler, K. (2018). [Super-resolution of Sentinel-2 images: Learning a globally applicable deep neural network.](https://arxiv.org/abs/1803.04271) ISPRS Journal of Photogrammetry and Remote Sensing, 146, 305-319. 
