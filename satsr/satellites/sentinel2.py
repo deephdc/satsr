@@ -124,8 +124,8 @@ def read_bands(tile_path, roi_x_y=None, roi_lon_lat=None, max_res=60, select_UTM
         ds = gdal.Open(dsname)
 
         if roi_lon_lat:  # transform lonlat coordinates to pixels
-            roi_x1, roi_y1 = gdal_utils.lonlat_to_xy(roi_lon1, roi_lat1)
-            roi_x2, roi_y2 = gdal_utils.lonlat_to_xy(roi_lon2, roi_lat2)
+            roi_x1, roi_y1 = gdal_utils.lonlat_to_xy(roi_lon1, roi_lat1, ds)
+            roi_x2, roi_y2 = gdal_utils.lonlat_to_xy(roi_lon2, roi_lat2, ds)
 
         if roi_x_y or roi_lon_lat:
             tmxmin = max(min(roi_x1, roi_x2, ds.RasterXSize - 1), 0)
