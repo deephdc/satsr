@@ -30,13 +30,13 @@ from satsr.utils import misc
 # FIXME: There is a memory leak? --> outputs should be periodically cleared
 
 
-def catch_error(f):
-    def wrap(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except Exception as e:
-            raise HTTPBadRequest(reason=e)
-    return wrap
+# def catch_error(f):
+#     def wrap(*args, **kwargs):
+#         try:
+#             return f(*args, **kwargs)
+#         except Exception as e:
+#             raise HTTPBadRequest(reason=e)
+#     return wrap
 
 
 def update_user_conf(user_args):
@@ -81,7 +81,7 @@ def train(**args):
         train_fn(TIMESTAMP=TIMESTAMP, CONF=CONF)
 
 
-@catch_error
+# @catch_error
 def predict(**args):
 
     if (not any([args['urls'], args['files']]) or
