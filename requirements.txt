@@ -11,6 +11,6 @@ requests>=2.18.4
 PyYAML>=3.12
 Keras==2.2.4
 tqdm>=4.31.1
-webargs>=5.5.2
+webargs>=5.5.2,<6.0.0
 aiohttp>=3.6.2
 deepaas>=1.0.0
