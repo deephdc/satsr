@@ -214,11 +214,11 @@ def get_predict_args():
                                    type="file",
                                    data_key="data",
                                    location="form",
-                                   description="Select the audio file you want to classify.")
+                                   description="Select the file you want to classify.")
 
     parser['urls'] = fields.Url(required=False,
                                 missing=None,
-                                description="Select an URL of the audio file you want to classify.")
+                                description="Select an URL of the file you want to classify.")
     # missing action="append" --> append more than one url
 
     # Add format type of the response
