@@ -31,11 +31,11 @@ In the case of Sentinel 2, we upsample 60m and 20m resolution bands to 10m resol
 **Available processing levels for super-resolution**
 
 * Level 1C:
-[Sample - Level 1C](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL1C_20170608T105651_N0205_R094_T30TWM_20170608T110453.SAFE.zip
+[Sample - Level 1C](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL1C_20170608T105651_N0205_R094_T30TWM_20170608T110453.SAFE.zip
 )
 
 * Level 2A:
-[Sample - Level 2A](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip)
+[Sample - Level 2A](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip)
 
 **References**
 
