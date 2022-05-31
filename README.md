@@ -125,7 +125,7 @@ you want and click 'Execute'. You can **either** supply a:
 
 OR
 * an `url` argument with an URL pointing to a compressed file (`zip` or tarball) containing your satellite tile.
-Here is an [example](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip)
+Here is an [example](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip)
 of such an url for the Sentinel-2 L2A that you can use for testing purposes. You can find other sample url for other satellites [here](./reports/additional_notes.md).
 
 
