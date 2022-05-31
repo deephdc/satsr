@@ -31,8 +31,7 @@ In the case of Sentinel 2, we upsample 60m and 20m resolution bands to 10m resol
 **Available processing levels for super-resolution**
 
 * Level 1C:
-[Sample - Level 1C](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL1C_20170608T105651_N0205_R094_T30TWM_20170608T110453.SAFE.zip
-)
+[Sample - Level 1C](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL1C_20170608T105651_N0205_R094_T30TWM_20170608T110453.SAFE.zip)
 
 * Level 2A:
 [Sample - Level 2A](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip)
@@ -78,7 +77,7 @@ landsat8_tiles/
 **Available processing levels for super-resolution**
 
 * Level 1C:
-[Sample - Level 1C](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/LC82150652019025LGN00.zip)
+[Sample - Level 1C](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/LC82150652019025LGN00.zip)
 
 **References**
 
@@ -97,7 +96,7 @@ In the case of VIIRS we upsample the 750m resolution bands to 350m resolution.
 **Available processing levels for super-resolution**
 
 * Level 2 - VNP09 Dataset:
-[Sample - VNP09](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/VNP09.A2019021.2142.001.2019035204543.zip)
+[Sample - VNP09](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/VNP09.A2019021.2142.001.2019035204543.zip)
 
 :warning: There is a [minor bug](https://github.com/deephdc/satsr/blob/master/satsr/satellites/viirs.py#L130-L151) when setting the geotransform and geoprojection of the new superresolved VIIRS images. If anyone has experience with GDAL and/or VIIRS imagery, we are happy to accept PR patches!
 
@@ -124,7 +123,7 @@ Thefore in the case of MODIS we upsample the 500m and 1km resolution bands to 25
 **Available processing levels for super-resolution**
 
 * Level 2 - MOD09 Dataset:
-[Sample - MOD09](https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/MOD09.A2019021.1710.006.2019023051303.zip)
+[Sample - MOD09](https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/MOD09.A2019021.1710.006.2019023051303.zip)
 
 :warning: There is a [minor bug](https://github.com/deephdc/satsr/blob/master/satsr/satellites/modis.py#L149-L170) when setting the geotransform and geoprojection of the new superresolved MODIS images. If anyone has experience with GDAL and/or MODIS imagery, we are happy to accept PR patches!
 
