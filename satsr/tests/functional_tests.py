@@ -8,7 +8,7 @@ from satsr.api import predict_data, predict_url
 
 
 def test_predict_url():
-    url = 'https://cephrgw01.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip'
+    url = 'https://api.cloud.ifca.es:8080/swift/v1/satellite_samples/S2A_MSIL2A_20190123T040041_N0211_R004_T48UXF_20190123T061251.SAFE.zip'
     args = {'urls': [url], 'roi_x_y_test': "[2000, 2000, 2500, 2500]", 'max_res_test': "20"}
     results = predict_url(args)
 
