@@ -51,7 +51,7 @@ class Satellite:
         self.platform = platform
 
         # API
-        self.api_url = 'https://scihub.copernicus.eu/apihub/'
+        self.api_url = 'https://scihub.copernicus.eu/dhus/'
         self.credentials = {'username': username, 'password': password}
 
     def search(self, omit_corners=True):
